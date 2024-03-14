@@ -1,20 +1,35 @@
-import React from 'react';
-import {View, StyleSheet, Text} from 'react-native';
+import React, { Component } from 'react';
+import {View, StyleSheet, Text, ScrollView} from 'react-native';
+import { AudioContext } from '../context/AudioProvider';
 
-const AudioList = () => {
-    return (
-        <View styles={styles.container}>
-            <Text>Audio List</Text>
-        </View>
-    );
+class AudioList extends Component {
+    static contextType = AudioContext
+    render() {
+        return (
+            <ScrollView>
+                {this.context.audioFiles.map(item => 
+                <Text style={{
+                    padding: 10, 
+                    borderBottomColor: 'red', 
+                    borderBottomWidth: 2,
+                }} 
+                key={item.id}
+                >
+                {item.filename}
+                </Text>)}
+                
+            </ScrollView>
+        );
+    }
 }
 
 const styles = StyleSheet.create({
-    container:{
+    container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
-    }
-})
+        alignItems: 'center',
+    },
+});
 
 export default AudioList;
+
