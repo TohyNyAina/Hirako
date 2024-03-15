@@ -1,31 +1,35 @@
 import React, { Component, createContext } from "react";
 import { View, StyleSheet, Text, Alert } from "react-native";
 import * as MediaLibrary from "expo-media-library";
+import { DataProvider } from "recyclerlistview";
 
 export const AudioContext = createContext();
+
 class AudioProvider extends Component {
   constructor(props) {
     super(props);
     this.state = {
       audioFiles: [],
       permissionError: false,
+      dataProvider: new DataProvider((r1, r2) => r1 !== r2)
     };
   }
 
-  permissionAllert = () => {
+  permissionAlert = () => {
     Alert.alert("Permission Required", "This app needs to read audio files!", [
       {
         text: "I am ready",
         onPress: () => this.getPermission(),
       },
       {
-        text: "cancle",
-        onPress: () => this.permissionAllert(),
+        text: "Cancel",
+        onPress: () => this.permissionAlert(),
       },
     ]);
   };
 
   getAudioFiles = async () => {
+    const { dataProvider, audioFiles } = this.state;
     let media = await MediaLibrary.getAssetsAsync({
       mediaType: "audio",
     });
@@ -34,42 +38,37 @@ class AudioProvider extends Component {
       first: media.totalCount,
     });
 
-    this.setState({ ...this.state, audioFiles: media.assets });
+    this.setState({
+      dataProvider: dataProvider.cloneWithRows([
+        ...audioFiles,
+        ...media.assets,
+      ]),
+      audioFiles: [...audioFiles, ...media.assets],
+    });
   };
 
   getPermission = async () => {
-    // {
-    //     "canAskAgain": true,
-    //     "expires": "never",
-    //     "granted": false,
-    //     "status": "undetermined",
-    // }
     const permission = await MediaLibrary.getPermissionsAsync();
     if (permission.granted) {
-      // we want to get all the audio files
       this.getAudioFiles();
     }
 
-    if(!permission.canAskAgain && !permission.granted){
-        this.setState({...this.state, permissionError: true});
+    if (!permission.canAskAgain && !permission.granted) {
+      this.setState({ permissionError: true });
     }
 
     if (!permission.granted && permission.canAskAgain) {
-      const { status, canAskAgain } =
-        await MediaLibrary.requestPermissionsAsync();
+      const { status, canAskAgain } = await MediaLibrary.requestPermissionsAsync();
       if (status === "denied" && canAskAgain) {
-        // we are going to display alert that user must allow this permission to work this app
-        this.permissionAllert();
+        this.permissionAlert();
       }
 
       if (status === "granted") {
-        // we want to get all the audio files
         this.getAudioFiles();
       }
 
       if (status === "denied" && !canAskAgain) {
-        // we want to display some error to the user
-        this.setState({ ...this.state, permissionError: true });
+        this.setState({ permissionError: true });
       }
     }
   };
@@ -79,28 +78,35 @@ class AudioProvider extends Component {
   }
 
   render() {
-    if (this.state.permissionError)
+    const { audioFiles, dataProvider, permissionError } = this.state;
+    if (permissionError) {
       return (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Text style={{ fontSize: 25, textAlign: "center", color: "red" }}>
-            It looks like you haven't accept the permission.
+        <View style={styles.container}>
+          <Text style={styles.errorText}>
+            It looks like you haven't accepted the permission.
           </Text>
         </View>
       );
+    }
     return (
-      <AudioContext.Provider value={{ audioFiles: this.state.audioFiles }}>
+      <AudioContext.Provider value={{ audioFiles, dataProvider }}>
         {this.props.children}
       </AudioContext.Provider>
     );
   }
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    fontSize: 25,
+    textAlign: "center",
+    color: "red",
+  },
+});
 
 export default AudioProvider;
