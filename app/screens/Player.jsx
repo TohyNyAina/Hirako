@@ -1,8 +1,11 @@
 import React from 'react';
-import {View, StyleSheet,Text} from 'react-native';
+import {View, StyleSheet,Text, Dimensions} from 'react-native';
 import Screen from '../components/Screen';
 import color from '../misc/color';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Slider from '@react-native-community/slider';
+
+const {width} = Dimensions.get('window')
 
 const Player = () => {
     return <Screen>
@@ -16,6 +19,13 @@ const Player = () => {
             </View>
             <View style={styles.audioPlayerContainer}>
                 <Text numberOfLines={1} style={styles.audioTitle}>Audio File Name</Text>
+                <Slider
+                    style={{width: width, height: 40}}
+                    minimumValue={0}
+                    maximumValue={1}
+                    minimumTrackTintColor={color.FONT_MEDIUM}
+                    maximumTrackTintColor={color.ACTIVE_BG}
+                />
             </View>
         </View>
     </Screen>
