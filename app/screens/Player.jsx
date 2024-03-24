@@ -6,7 +6,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import PlayerButton from '../components/PlayerButton';
 import { AudioContext } from '../context/AudioProvider';
-import { pause, play, resume } from '../misc/audioController';
+import { pause, play, playNext, resume } from '../misc/audioController';
+import { storeAudioForNextOpening } from "../misc/helper";
 
 const {width} = Dimensions.get('window')
 
@@ -56,6 +57,50 @@ const Player = () => {
         }
     };
 
+    const handleNext = async () => {
+        const { playbackObj, audioFiles, currentAudioIndex, totalAudioCount, updateState } = context;
+    
+        let newIndex = currentAudioIndex + 1;
+        if (newIndex >= totalAudioCount) {
+            newIndex = 0;
+        }
+    
+        const newAudio = audioFiles[newIndex];
+        const status = await playNext(playbackObj, newAudio.uri);
+    
+        updateState(context, {
+            currentAudio: newAudio,
+            playbackObj,
+            soundObj: status,
+            isPlaying: true,
+            currentAudioIndex: newIndex,
+        });
+    
+        storeAudioForNextOpening(newAudio, newIndex);
+    };
+    
+    const handlePrevious = async () => {
+        const { playbackObj, audioFiles, currentAudioIndex, totalAudioCount, updateState } = context;
+    
+        let newIndex = currentAudioIndex - 1;
+        if (newIndex < 0) {
+            newIndex = totalAudioCount - 1;
+        }
+    
+        const newAudio = audioFiles[newIndex];
+        const status = await playNext(playbackObj, newAudio.uri);
+    
+        updateState(context, {
+            currentAudio: newAudio,
+            playbackObj,
+            soundObj: status,
+            isPlaying: true,
+            currentAudioIndex: newIndex,
+        });
+    
+        storeAudioForNextOpening(newAudio, newIndex);
+    };
+    
     if(!context.currentAudio) return null;
 
     return <Screen>
@@ -83,13 +128,17 @@ const Player = () => {
                 />
             </View>
             <View style={styles.audioControllers}>
-                <PlayerButton iconType='PREV'/>
+                <PlayerButton iconType='PREV'
+                    onPress={handlePrevious}
+                />
                 <PlayerButton
                     onPress={handlePlayPause} 
                     style={{marginHorizontal: 25}} 
                     iconType={context.isPlaying ? 'PLAY' : 'PAUSE'}
                 />
-                <PlayerButton iconType='NEXT'/>
+                <PlayerButton iconType='NEXT'
+                    onPress={handleNext}
+                />
             </View>
         </View>
     </Screen>
