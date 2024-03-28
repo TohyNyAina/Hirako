@@ -20,6 +20,7 @@ const PlayList = () => {
             <PlayListInputModal 
                 visible={modalVisible}
                 onClose={() => setModalVisible(false)} 
+                onSubmit={playListName => console.log(playListName)}
             />
         </ScrollView>
     );

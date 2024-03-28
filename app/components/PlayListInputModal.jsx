@@ -11,19 +11,31 @@ import {
 import { AntDesign } from '@expo/vector-icons';
 import color from '../misc/color';
 
-const PlayListInputModal = ({visible, onClose, onsubmit}) => {
+const PlayListInputModal = ({visible, onClose, onSubmit}) => {
+
+    const [playListName, setPlayListName] = useState('');
+
+    const handleOnSubmit = () => {
+        if(!playListName.trim()){
+            onClose()
+        }else{
+            onSubmit(playListName)
+            onClose()
+        }
+    }
+
     return (
         <Modal visible={visible} animationType='fade' transparent>
             <View style={styles.modalContainer}>
                 <View style={styles.inputContainer}>
                     <Text style={{ color: color.ACTIVE_BG }}>Create New Playlist</Text>
-                    <TextInput style={styles.input} />
+                    <TextInput value={playListName} onChangeText={(text) => setPlayListName(text)} style={styles.input} />
                     <AntDesign 
                         name="check" 
                         size={24} 
                         color={color.ACTIVE_FONT} 
                         style={styles.submitIcon} 
-                        onPress={onsubmit}    
+                        onPress={handleOnSubmit}    
                     />
                 </View>            
             </View>
