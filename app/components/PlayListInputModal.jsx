@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     View, 
     StyleSheet, 
@@ -19,7 +19,8 @@ const PlayListInputModal = ({visible, onClose, onSubmit}) => {
         if(!playListName.trim()){
             onClose()
         }else{
-            onSubmit(playListName)
+            onSubmit(playListName);
+            setPlayListName('');
             onClose()
         }
     }
