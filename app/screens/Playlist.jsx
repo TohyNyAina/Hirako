@@ -68,6 +68,7 @@ const PlayList = () => {
                     <TouchableOpacity 
                         key={item.id.toString()}
                         style={styles.playListBanner}
+                        onPress={() => handleBannerPress(item)}
                     >
                         <Text>{item.title}</Text>
                         <Text style={styles.audioCount}>
