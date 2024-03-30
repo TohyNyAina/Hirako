@@ -5,7 +5,8 @@ import {
     Text, 
     ScrollView, 
     TouchableOpacity,
-    FlatList
+    FlatList,
+    Alert
 } from 'react-native';
 import { AudioContext } from "../context/AudioProvider";
 import color from '../misc/color';
@@ -60,6 +61,39 @@ const PlayList = () => {
             renderPlayList()
         }
     })
+
+    const handleBannerPress = async playList => {
+        // update playlist if there is any selected audio.
+        if(addToPlayList){
+            const result = await AsyncStorage.getItem('playlist');
+
+            let oldList = [];
+            let sameAudio = false;
+
+            if (result !== null) {
+                oldList = JSON.parse(result);
+                
+                oldList.filter(list => {
+                    if(list.id === playList.id){
+                        // we want to check is that same audio is already inside our list or not.
+                        for (let audio of list.audios){
+                            if(audio.id === addToPlayList.id){
+                                // alert with some message
+                                sameAudio = true;
+                                return;
+                            }
+                        }
+                    }
+                })
+            }
+
+            if(sameAudio){
+                Alert.alert()
+            }
+        }
+
+        // if there is no audio selected then we want open the list.
+    }
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
