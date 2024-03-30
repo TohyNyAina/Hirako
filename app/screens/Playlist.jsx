@@ -88,7 +88,7 @@ const PlayList = () => {
             }
 
             if(sameAudio){
-                Alert.alert()
+                Alert.alert('Found same audio!', `${addToPlayList.filename} is already inside the list.`)
             }
         }
 
