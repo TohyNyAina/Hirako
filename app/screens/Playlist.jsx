@@ -63,17 +63,18 @@ const PlayList = () => {
     })
 
     const handleBannerPress = async playList => {
-        // update playlist if there is any selected audio.
+    
         if(addToPlayList){
             const result = await AsyncStorage.getItem('playlist');
 
             let oldList = [];
+            let updatedList = [];
             let sameAudio = false;
 
             if (result !== null) {
                 oldList = JSON.parse(result);
                 
-                oldList.filter(list => {
+                updatedList = oldList.filter(list => {
                     if(list.id === playList.id){
                         // we want to check is that same audio is already inside our list or not.
                         for (let audio of list.audios){
@@ -83,17 +84,29 @@ const PlayList = () => {
                                 return;
                             }
                         }
+                        
+                        // otherwise update the playlist.
+                        list.audios = [...list.audios, addToPlayList];
                     }
+
+                    return list;
                 })
+            
             }
 
             if(sameAudio){
-                Alert.alert('Found same audio!', `${addToPlayList.filename} is already inside the list.`)
+                Alert.alert('Found same audio!', `${addToPlayList.filename} is already inside the list.`);
+                sameAudio = false;
+                return updateState(context, {addToPlayList: null});
             }
+
+            updateState(context, {addToPlayList: null, playList: [...updatedList]});
+            return AsyncStorage.setItem('playlist', JSON.stringify([...updatedList]));
         }
 
         // if there is no audio selected then we want open the list.
-    }
+        console.log('opening list');
+    };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
