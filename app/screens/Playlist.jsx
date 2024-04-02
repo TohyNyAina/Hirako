@@ -12,9 +12,12 @@ import { AudioContext } from "../context/AudioProvider";
 import color from '../misc/color';
 import PlayListInputModal from '../components/PlayListInputModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import PlayListDetail from '../components/PlayListDetail';
 
+let selectedPlayList = {}
 const PlayList = () => {
     const [modalVisible, setModalVisible] = useState(false);
+    const [showPlayList, setShowPlaylist] = useState(false);
 
     const context = useContext(AudioContext)
     const {playList, addToPlayList, updateState} = context
@@ -109,6 +112,7 @@ const PlayList = () => {
     };
 
     return (
+        <>
         <ScrollView contentContainerStyle={styles.container}>
             {playList.length 
                 ? playList.map(item => (
@@ -140,6 +144,8 @@ const PlayList = () => {
                 onSubmit={createPlayList}
             />
         </ScrollView>
+        <PlayListDetail visible={showPlayList}/>
+        </>
     );
 }
 

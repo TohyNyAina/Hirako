@@ -6,7 +6,11 @@ const PlayListDetail = ({visible, playList}) => {
         <Modal visible={visible} animationType='slide' transparent >
             <View>
                 <Text>{playList.title}</Text>
-                <FlatList data={playList.audios} keyExtractor={item => item.id.toString()} />
+                <FlatList 
+                    data={playList.audios} 
+                    keyExtractor={item => item.id.toString()} 
+                    renderItem={({item}) => <Text>{item.filename}</Text>}
+                />
             </View>
         </Modal>
     );
