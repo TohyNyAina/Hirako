@@ -8,17 +8,26 @@ import {
     Dimensions
 } from 'react-native';
 import color from '../misc/color';
+import AudioListItem from '../components/AudioListItem'
 
-const PlayListDetail = ({visible, playList}) => {
+const PlayListDetail = ({visible, playList, onclose}) => {
     return (
-        <Modal visible={visible} animationType='slide' transparent >
+        <Modal 
+            visible={visible} 
+            animationType='slide' 
+            transparent 
+            onRequestClose={onclose} >
             <View style={styles.container}>
                 <Text style={styles.title}>{playList.title}</Text>
                 <FlatList 
                     contentContainerStyle={styles.listContainer}
                     data={playList.audios} 
                     keyExtractor={item => item.id.toString()} 
-                    renderItem={({item}) => <Text>{item.filename}</Text>}
+                    renderItem={({item}) => (
+                        <View style={{ marginBottom: 10 }}>
+                            <AudioListItem title={item.filename} duration={item.duration}/>
+                        </View>
+                    )}
                 />
             </View>
             <View style={[StyleSheet.absoluteFillObject,styles.modalBG]} />
@@ -47,7 +56,11 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     title: {
-        textAlign: 'center'
+        textAlign: 'center',
+        fontSize: 20,
+        paddingVertical: 5,
+        fontWeight: 'bold',
+        color: color.ACTIVE_BG,
     }
 });
 

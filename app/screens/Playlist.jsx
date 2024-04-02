@@ -145,7 +145,11 @@ const PlayList = () => {
                 onSubmit={createPlayList}
             />
         </ScrollView>
-        <PlayListDetail visible={showPlayList} playList={selectedPlayList}/>
+        <PlayListDetail 
+            visible={showPlayList} 
+            playList={selectedPlayList}
+            onclose={() => setShowPlaylist(false)}
+        />
         </>
     );
 }
