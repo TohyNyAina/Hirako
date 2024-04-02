@@ -108,7 +108,8 @@ const PlayList = () => {
         }
 
         // if there is no audio selected then we want open the list.
-        console.log('opening list');
+        selectedPlayList = playList;
+        setShowPlaylist(true);
     };
 
     return (
@@ -144,7 +145,7 @@ const PlayList = () => {
                 onSubmit={createPlayList}
             />
         </ScrollView>
-        <PlayListDetail visible={showPlayList}/>
+        <PlayListDetail visible={showPlayList} playList={selectedPlayList}/>
         </>
     );
 }
