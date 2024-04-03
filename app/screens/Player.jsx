@@ -6,7 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import PlayerButton from '../components/PlayerButton';
 import { AudioContext } from '../context/AudioProvider';
-import { pause, play, playNext, resume } from '../misc/audioController';
+import { changeAudio, pause, play, playNext, resume, selectAudio } from '../misc/audioController';
 import { storeAudioForNextOpening } from "../misc/helper";
 
 const {width} = Dimensions.get('window')
@@ -28,84 +28,87 @@ const Player = () => {
     }, []);
 
     const handlePlayPause = async () => {
-        // play
-        if(context.soundObj === null){
-            const audio = context.currentAudio;
-            const status = await play(context.playbackObj, audio.uri)
-            context.playbackObj.setOnPlaybackStatusUpdate(
-                context.onPlaybackStatusUpdate
-            );
-            return context.updateState(context, {
-                soundObj: status,
-                currentAudio: audio,
-                isPlaying: true,
-                currentAudioIndex: context.currentAudioIndex
-            })
-        }
-        // pause
-        if(context.soundObj && context.soundObj.isPlaying){
-            const status = await pause(context.playbackObj)
-            return context.updateState(context, {
-                soundObj: status,
-                isPlaying: false,
-            });
-        }
-        // resume 
-        if(context.soundObj && !context.soundObj.isPlaying){
-            const status = await resume(context.playbackObj)
-            return context.updateState(context, {
-                soundObj: status,
-                isPlaying: true,
-            });
-        }
+        await selectAudio(context.currentAudio, context);
+        // // play
+        // if(context.soundObj === null){
+        //     const audio = context.currentAudio;
+        //     const status = await play(context.playbackObj, audio.uri)
+        //     context.playbackObj.setOnPlaybackStatusUpdate(
+        //         context.onPlaybackStatusUpdate
+        //     );
+        //     return context.updateState(context, {
+        //         soundObj: status,
+        //         currentAudio: audio,
+        //         isPlaying: true,
+        //         currentAudioIndex: context.currentAudioIndex
+        //     })
+        // }
+        // // pause
+        // if(context.soundObj && context.soundObj.isPlaying){
+        //     const status = await pause(context.playbackObj)
+        //     return context.updateState(context, {
+        //         soundObj: status,
+        //         isPlaying: false,
+        //     });
+        // }
+        // // resume 
+        // if(context.soundObj && !context.soundObj.isPlaying){
+        //     const status = await resume(context.playbackObj)
+        //     return context.updateState(context, {
+        //         soundObj: status,
+        //         isPlaying: true,
+        //     });
+        // }
     };
 
     const handleNext = async () => {
-        const { playbackObj, audioFiles, currentAudioIndex, totalAudioCount, updateState } = context;
+        await changeAudio(context, 'next');
+        // const { playbackObj, audioFiles, currentAudioIndex, totalAudioCount, updateState } = context;
     
-        let newIndex = currentAudioIndex + 1;
-        if (newIndex >= totalAudioCount) {
-            newIndex = 0;
-        }
+        // let newIndex = currentAudioIndex + 1;
+        // if (newIndex >= totalAudioCount) {
+        //     newIndex = 0;
+        // }
     
-        const newAudio = audioFiles[newIndex];
-        const status = await playNext(playbackObj, newAudio.uri);
+        // const newAudio = audioFiles[newIndex];
+        // const status = await playNext(playbackObj, newAudio.uri);
     
-        updateState(context, {
-            currentAudio: newAudio,
-            playbackObj,
-            soundObj: status,
-            isPlaying: true,
-            currentAudioIndex: newIndex,
-            playbackPosition: null,
-            playbackDuration: null,
-        });
+        // updateState(context, {
+        //     currentAudio: newAudio,
+        //     playbackObj,
+        //     soundObj: status,
+        //     isPlaying: true,
+        //     currentAudioIndex: newIndex,
+        //     playbackPosition: null,
+        //     playbackDuration: null,
+        // });
     
-        storeAudioForNextOpening(newAudio, newIndex);
+        // storeAudioForNextOpening(newAudio, newIndex);
     };
     
     const handlePrevious = async () => {
-        const { playbackObj, audioFiles, currentAudioIndex, totalAudioCount, updateState } = context;
+        await changeAudio(context, 'previous')
+        // const { playbackObj, audioFiles, currentAudioIndex, totalAudioCount, updateState } = context;
     
-        let newIndex = currentAudioIndex - 1;
-        if (newIndex < 0) {
-            newIndex = totalAudioCount - 1;
-        }
+        // let newIndex = currentAudioIndex - 1;
+        // if (newIndex < 0) {
+        //     newIndex = totalAudioCount - 1;
+        // }
     
-        const newAudio = audioFiles[newIndex];
-        const status = await playNext(playbackObj, newAudio.uri);
+        // const newAudio = audioFiles[newIndex];
+        // const status = await playNext(playbackObj, newAudio.uri);
     
-        updateState(context, {
-            currentAudio: newAudio,
-            playbackObj,
-            soundObj: status,
-            isPlaying: true,
-            currentAudioIndex: newIndex,
-            playbackPosition: null,
-            playbackDuration: null,
-        });
+        // updateState(context, {
+        //     currentAudio: newAudio,
+        //     playbackObj,
+        //     soundObj: status,
+        //     isPlaying: true,
+        //     currentAudioIndex: newIndex,
+        //     playbackPosition: null,
+        //     playbackDuration: null,
+        // });
     
-        storeAudioForNextOpening(newAudio, newIndex);
+        // storeAudioForNextOpening(newAudio, newIndex);
     };
     
     if(!context.currentAudio) return null;
