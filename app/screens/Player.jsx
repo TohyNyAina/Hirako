@@ -6,8 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import PlayerButton from '../components/PlayerButton';
 import { AudioContext } from '../context/AudioProvider';
-import { changeAudio, pause, play, playNext, resume, selectAudio } from '../misc/audioController';
-import { storeAudioForNextOpening } from "../misc/helper";
+import { changeAudio, selectAudio } from '../misc/audioController';
 
 const {width} = Dimensions.get('window')
 
