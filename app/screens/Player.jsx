@@ -127,6 +127,9 @@ const Player = () => {
                 <Text numberOfLines={1} style={styles.audioTitle}>
                     {context.currentAudio.filename}
                 </Text>
+                <View>
+                    
+                </View>
                 <Slider
                     style={{width: width, height: 40}}
                     minimumValue={0}
