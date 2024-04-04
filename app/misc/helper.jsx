@@ -14,6 +14,10 @@ export const convertTime = (minutes) => {
       if (parseInt(minute) < 10 && sec < 10) {
         return `0${minute}:0${sec}`;
       }
+
+      if (sec == 60) {
+        return `${minute + 1}:00`;
+      }
   
       if (parseInt(minute) < 10) {
         return `0${minute}:${sec}`;
