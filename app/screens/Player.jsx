@@ -7,6 +7,7 @@ import Slider from '@react-native-community/slider';
 import PlayerButton from '../components/PlayerButton';
 import { AudioContext } from '../context/AudioProvider';
 import { changeAudio, selectAudio } from '../misc/audioController';
+import { convertTime } from '../misc/helper';
 
 const {width} = Dimensions.get('window')
 
@@ -109,7 +110,11 @@ const Player = () => {
     
         // storeAudioForNextOpening(newAudio, newIndex);
     };
-    
+
+    const renderCurrentTime = () => {
+        return convertTime(context.playbackPosition / 1000)
+    }
+
     if(!context.currentAudio) return null;
 
     return <Screen>
@@ -127,8 +132,15 @@ const Player = () => {
                 <Text numberOfLines={1} style={styles.audioTitle}>
                     {context.currentAudio.filename}
                 </Text>
-                <View>
-                    
+                <View 
+                    style={{
+                        flexDirection: 'row', 
+                        justifyContent: 'space-between',
+                        paddingHorizontal: 15,
+                    }}
+                >
+                    <Text>{convertTime(context.currentAudio.duration)}</Text>
+                    <Text>{renderCurrentTime()}</Text>
                 </View>
                 <Slider
                     style={{width: width, height: 40}}
