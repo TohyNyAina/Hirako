@@ -6,7 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import PlayerButton from '../components/PlayerButton';
 import { AudioContext } from '../context/AudioProvider';
-import { changeAudio, resume, selectAudio } from '../misc/audioController';
+import { changeAudio, moveAudio, resume, selectAudio } from '../misc/audioController';
 import { convertTime } from '../misc/helper';
 
 const {width} = Dimensions.get('window')
@@ -165,18 +165,7 @@ const Player = () => {
                                 console.log('error inside onSlidingStart callback', error);
                             }
                     }}
-                    onSlidingComplete={async (value) => {
-                        if(context.soundObj === null || !context.isPlaying ) return;
-
-                        try {
-                            const status = await context.playbackObj.setPositionAsync(Math.floor(context.soundObj.durationMillis * value))
-                            context.updateState(context, { soundObj: status, playbackPosition: status.positionMillis })
-                        
-                            await resume(context.playbackObj);
-                        } catch (error) {
-                            console.log('error inside onSlidingComplete callback', error);
-                        }   
-                    }}
+                    onSlidingComplete={async value => await moveAudio(context, value)}
                 />
             </View>
             <View style={styles.audioControllers}>
