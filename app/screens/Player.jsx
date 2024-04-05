@@ -139,8 +139,8 @@ const Player = () => {
                         paddingHorizontal: 15,
                     }}
                 >
-                    <Text>{convertTime(context.currentAudio.duration)}</Text>
                     <Text>{renderCurrentTime()}</Text>
+                    <Text>{convertTime(context.currentAudio.duration)}</Text>
                 </View>
                 <Slider
                     style={{width: width, height: 40}}
@@ -149,6 +149,9 @@ const Player = () => {
                     value={calculateSeebBar()}
                     minimumTrackTintColor={color.FONT_MEDIUM}
                     maximumTrackTintColor={color.ACTIVE_BG}
+                    onValueChange={(value) => {
+
+                    }}
                 />
             </View>
             <View style={styles.audioControllers}>
