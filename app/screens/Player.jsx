@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {View, StyleSheet,Text, Dimensions} from 'react-native';
 import Screen from '../components/Screen';
 import color from '../misc/color';
@@ -12,6 +12,7 @@ import { convertTime } from '../misc/helper';
 const {width} = Dimensions.get('window')
 
 const Player = () => {
+    const [currentPosition, setCurrentPosition] = useState()
     const context = useContext (AudioContext);
     const { playbackPosition,
         playbackDuration, } = context;
@@ -139,7 +140,7 @@ const Player = () => {
                         paddingHorizontal: 15,
                     }}
                 >
-                    <Text>{renderCurrentTime()}</Text>
+                    <Text>{currentPosition ? currentPosition : renderCurrentTime()}</Text>
                     <Text>{convertTime(context.currentAudio.duration)}</Text>
                 </View>
                 <Slider
@@ -149,8 +150,10 @@ const Player = () => {
                     value={calculateSeebBar()}
                     minimumTrackTintColor={color.FONT_MEDIUM}
                     maximumTrackTintColor={color.ACTIVE_BG}
-                    onValueChange={(value) => {
-
+                    onValueChange={value => {
+                        setCurrentPosition(
+                            convertTime(value * context.currentAudio.duration)
+                        );
                     }}
                 />
             </View>
