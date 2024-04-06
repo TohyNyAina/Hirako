@@ -15,7 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import PlayListDetail from '../components/PlayListDetail';
 
 let selectedPlayList = {}
-const PlayList = () => {
+const PlayList = ({navigation}) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [showPlayList, setShowPlaylist] = useState(false);
 
@@ -109,7 +109,8 @@ const PlayList = () => {
 
         // if there is no audio selected then we want open the list.
         selectedPlayList = playList;
-        setShowPlaylist(true);
+        // setShowPlaylist(true);
+        navigation.navigate('PlayListDetail', playList);
     };
 
     return (
@@ -144,12 +145,12 @@ const PlayList = () => {
                 onClose={() => setModalVisible(false)} 
                 onSubmit={createPlayList}
             />
+            <PlayListDetail 
+                visible={showPlayList} 
+                playList={selectedPlayList}
+                onclose={() => setShowPlaylist(false)}
+            />
         </ScrollView>
-        <PlayListDetail 
-            visible={showPlayList} 
-            playList={selectedPlayList}
-            onclose={() => setShowPlaylist(false)}
-        />
         </>
     );
 }

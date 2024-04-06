@@ -43,7 +43,7 @@ export const playNext = async ( playbackObj, uri ) => {
     }
 };
 
-export const selectAudio = async (audio, context) => {
+export const selectAudio = async (audio, context, playListInfo = {}) => {
     const {
         soundObj, 
         playbackObj, 
@@ -57,13 +57,15 @@ export const selectAudio = async (audio, context) => {
         // playing audio for the first time.
         if (soundObj === null) {
             const status = await play(playbackObj, audio.uri);
-            const index = audioFiles.indexOf(audio)
+            const index = audioFiles.findIndex(({ id }) => id === audio.id);
             updateState(context, {
                 currentAudio: audio,
-                playbackObj: playbackObj,
                 soundObj: status,
                 isPlaying: true,
                 currentAudioIndex: index,
+                isPlayListRunning: false,
+                activePlayList: [],
+                ...playListInfo
             });
             playbackObj.setOnPlaybackStatusUpdate(
                 onPlaybackStatusUpdate
@@ -81,7 +83,7 @@ export const selectAudio = async (audio, context) => {
                 return updateState(context, {
                     soundObj: status, 
                     isPlaying: false, 
-                    playbackPosition: status.positionMillis 
+                    playbackPosition: status.positionMillis,
                 });
             }
 
@@ -97,13 +99,16 @@ export const selectAudio = async (audio, context) => {
 
         // select another audio
         if(soundObj.isLoaded && currentAudio.id !== audio.id){
-            status = await playNext(playbackObj, audio.uri)
-            newIndex = audioFiles.indexOf(audio)
+            const status = await playNext(playbackObj, audio.uri);
+            const newIndex = audioFiles.findIndex(({id}) => id === audio.id);
             updateState(context, {
                 currentAudio: audio,
                 soundObj: status,
                 isPlaying: true,
                 currentAudioIndex: newIndex,
+                isPlayListRunning: false,
+                activePlayList: [],
+                ...playListInfo,
             });
             return storeAudioForNextOpening(audio, newIndex);
         }

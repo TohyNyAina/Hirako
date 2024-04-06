@@ -9,8 +9,14 @@ import {
 } from 'react-native';
 import color from '../misc/color';
 import AudioListItem from '../components/AudioListItem'
+import { selectAudio } from '../misc/audioController';
 
 const PlayListDetail = ({visible, playList, onclose}) => {
+
+    const playAudio = (audio) => {
+        selectAudio(audio)
+    }
+
     return (
         <Modal 
             visible={visible} 
@@ -25,7 +31,7 @@ const PlayListDetail = ({visible, playList, onclose}) => {
                     keyExtractor={item => item.id.toString()} 
                     renderItem={({item}) => (
                         <View style={{ marginBottom: 10 }}>
-                            <AudioListItem title={item.filename} duration={item.duration}/>
+                            <AudioListItem title={item.filename} duration={item.duration} onAudioPress={() => playAudio(item)}/>
                         </View>
                     )}
                 />

@@ -2,6 +2,8 @@ import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import AppNavigator from "./app/navigation/AppNavigator";
 import AudioProvider from "./app/context/AudioProvider";
 import color from "./app/misc/color";
+import 'react-native-gesture-handler';
+
 
 const MyTheme = {
   ...DefaultTheme,
