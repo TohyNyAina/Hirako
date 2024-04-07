@@ -132,12 +132,18 @@ class AudioList extends Component {
   }
 
   rowRenderer = (type, item, index, extendedState) => {
+    if (!item || typeof item !== 'object') {
+      return null; // Éviter les erreurs si l'élément est null ou n'est pas un objet
+    }
+  
+    const { filename, duration } = item;
+
     return (
       <AudioListItem
-        title={item.filename}
+        title={filename ? filename : 'Unknown'}
         isPlaying={extendedState.isPlaying}
         activeListItem={this.context.currentAudioIndex === index}
-        duration={item.duration}
+        duration={duration ? duration : 'Unknown'}
         onAudioPress={() => this.handleAudioPress(item)}
         onOptionPress={() => {
           this.currentItem = item;

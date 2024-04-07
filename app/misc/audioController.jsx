@@ -118,10 +118,57 @@ export const selectAudio = async (audio, context, playListInfo = {}) => {
     
 };
 
+const selectAudioFromPlayList = async (context, select) => {
+    const {activePlayList, currentAudio, audioFiles, playbackObj, updateState} = context;
+    let audio;
+    let defaultIndex;
+    let nextIndex;
+
+    const indexOnPlayList = activePlayList.audios.findIndex(
+        ({id}) => id === currentAudio.id
+    );
+
+    if(select === 'next') {
+        nextIndex = indexOnPlayList + 1;
+        defaultIndex = 0;
+    }
+
+    if(select === 'previous') {
+        nextIndex = indexOnPlayList - 1;
+        defaultIndex = activePlayList.audio.length - 1;
+    }
+    audio = activePlayList.audios[nextIndex];
+
+    if(!audio) audio = activePlayList.audios[defaultIndex];
+
+    const indexOnAllList = audioFiles.findIndex(
+      ({id}) => id === audio.id
+    );
+
+    const status = await playNext(playbackObj, audio.uri)
+    return updateState(context, {
+      soundObj: status,
+      isPlaying: true,
+      currentAudio: audio,
+      currentAudioIndex: indexOnAllList,
+    });
+}
+
 export const changeAudio = async (context, select) => {
     
     try {
-        const { playbackObj, audioFiles, currentAudioIndex, totalAudioCount, updateState } = context;
+        const { 
+            playbackObj, 
+            audioFiles, 
+            currentAudioIndex, 
+            totalAudioCount, 
+            updateState,
+            onPlaybackStatusUpdate, 
+            isPlayListRunning
+        } = context;
+
+        if(isPlayListRunning) return selectAudioFromPlayList(context, select)
+
         let newIndex, newAudio, status;
         // for next
         if(select === 'next'){
@@ -132,6 +179,7 @@ export const changeAudio = async (context, select) => {
 
             newAudio = audioFiles[newIndex];
             status = await playNext(playbackObj, newAudio.uri);
+            playbackObj.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
         }
 
         // for previous
@@ -143,7 +191,7 @@ export const changeAudio = async (context, select) => {
         
             newAudio = audioFiles[newIndex];
             status = await playNext(playbackObj, newAudio.uri);
-
+            playbackObj.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
         }
         
         updateState(context, {
