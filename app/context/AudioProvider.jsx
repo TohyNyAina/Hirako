@@ -5,6 +5,7 @@ import { DataProvider } from "recyclerlistview";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from 'expo-av';
 import { playNext } from "../misc/audioController";
+import { storeAudioForNextOpening } from "../misc/helper";
 
 export const AudioContext = createContext();
 
@@ -113,6 +114,14 @@ class AudioProvider extends Component {
         playbackPosition: playbackStatus.positionMillis,
         playbackDuration: playbackStatus.durationMillis,
       });
+    }
+
+    if(playbackStatus.isLoaded && !playbackStatus.isPlaying){
+      storeAudioForNextOpening(
+        this.state.currentAudio, 
+        this.state.currentAudioIndex, 
+        playbackStatus.positionMillis
+      );
     }
 
     if (playbackStatus.didJustFinish) {
