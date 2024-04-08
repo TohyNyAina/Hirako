@@ -1,34 +1,51 @@
-import React from "react";
+import React from 'react';
 import {
-  Text,
   View,
   StyleSheet,
   Modal,
   StatusBar,
+  Text,
   TouchableWithoutFeedback,
-} from "react-native";
-import color from "../misc/color";
+} from 'react-native';
+import color from '../misc/color';
 
-const OptionModal = ({ visible, currentItem, onclose, onPlayPress, onPlayListPress }) => {
+const OptionModal = ({
+  visible,
+  currentItem,
+  onClose,
+  options,
+  onPlayPress,
+  onPlayListPress,
+}) => {
   const { filename } = currentItem;
   return (
     <>
       <StatusBar hidden />
-      <Modal animationType="slide" transparent visible={visible}>
+      <Modal animationType='slide' transparent visible={visible}>
         <View style={styles.modal}>
           <Text style={styles.title} numberOfLines={2}>
             {filename}
           </Text>
           <View style={styles.optionContainer}>
-            <TouchableWithoutFeedback onPress={onPlayPress}>
+            {options.map(optn => {
+              return (
+                <TouchableWithoutFeedback
+                  key={optn.title}
+                  onPress={optn.onPress}
+                >
+                  <Text style={styles.option}>{optn.title}</Text>
+                </TouchableWithoutFeedback>
+              );
+            })}
+            {/* <TouchableWithoutFeedback onPress={onPlayPress}>
               <Text style={styles.option}>Play</Text>
             </TouchableWithoutFeedback>
             <TouchableWithoutFeedback onPress={onPlayListPress}>
               <Text style={styles.option}>Add to Playlist</Text>
-            </TouchableWithoutFeedback>
+            </TouchableWithoutFeedback> */}
           </View>
         </View>
-        <TouchableWithoutFeedback onPress={onclose}>
+        <TouchableWithoutFeedback onPress={onClose}>
           <View style={styles.modalBg} />
         </TouchableWithoutFeedback>
       </Modal>
@@ -38,7 +55,7 @@ const OptionModal = ({ visible, currentItem, onclose, onPlayPress, onPlayListPre
 
 const styles = StyleSheet.create({
   modal: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     right: 0,
     left: 0,
@@ -52,20 +69,20 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     padding: 20,
     paddingBottom: 0,
     color: color.FONT_MEDIUM,
   },
   option: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: color.FONT,
     paddingVertical: 10,
     letterSpacing: 1,
   },
   modalBg: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     right: 0,
     left: 0,

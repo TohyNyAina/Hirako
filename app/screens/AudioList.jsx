@@ -1,15 +1,21 @@
-import React, { Component } from "react";
-import { View, Text, Dimensions } from "react-native";
-import { AudioContext } from "../context/AudioProvider";
-import { RecyclerListView, LayoutProvider } from "recyclerlistview";
-import AudioListItem from "../components/AudioListItem";
-import Screen from "../components/Screen";
-import OptionModal from "../components/OptionModal";
-import { Audio } from "expo-av";
-import {pause, play, resume, playNext, selectAudio} from '../misc/audioController';
-import { storeAudioForNextOpening } from "../misc/helper";
+import React, { Component } from 'react';
+import { Text, View, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { AudioContext } from '../context/AudioProvider';
+import { RecyclerListView, LayoutProvider } from 'recyclerlistview';
+import AudioListItem from '../components/AudioListItem';
+import Screen from '../components/Screen';
+import OptionModal from '../components/OptionModal';
+import { Audio } from 'expo-av';
+import {
+  play,
+  pause,
+  resume,
+  playNext,
+  selectAudio,
+} from '../misc/audioController';
+import { storeAudioForNextOpening } from '../misc/helper';
 
-class AudioList extends Component {
+export class AudioList extends Component {
   static contextType = AudioContext;
 
   constructor(props) {
@@ -22,11 +28,11 @@ class AudioList extends Component {
   }
 
   layoutProvider = new LayoutProvider(
-    (i) => "audio",
+    i => 'audio',
     (type, dim) => {
       switch (type) {
-        case "audio":
-          dim.width = Dimensions.get("window").width;
+        case 'audio':
+          dim.width = Dimensions.get('window').width;
           dim.height = 70;
           break;
         default:
@@ -36,8 +42,8 @@ class AudioList extends Component {
     }
   );
 
-  // onPlaybackStatusUpdate = async (playbackStatus) => {
-  //   if(playbackStatus.isLoaded && playbackStatus.isPlaying){
+  // onPlaybackStatusUpdate = async playbackStatus => {
+  //   if (playbackStatus.isLoaded && playbackStatus.isPlaying) {
   //     this.context.updateState(this.context, {
   //       playbackPosition: playbackStatus.positionMillis,
   //       playbackDuration: playbackStatus.durationMillis,
@@ -47,21 +53,21 @@ class AudioList extends Component {
   //   if (playbackStatus.didJustFinish) {
   //     const nextAudioIndex = this.context.currentAudioIndex + 1;
   //     // there is no next audio to play or the current audio is the last
-  //     if(nextAudioIndex >= this.context.totalAudioCount){
+  //     if (nextAudioIndex >= this.context.totalAudioCount) {
   //       this.context.playbackObj.unloadAsync();
   //       this.context.updateState(this.context, {
   //         soundObj: null,
   //         currentAudio: this.context.audioFiles[0],
   //         isPlaying: false,
-  //         currentAudioIndex: [0],
+  //         currentAudioIndex: 0,
   //         playbackPosition: null,
-  //         playbackDuration: null
+  //         playbackDuration: null,
   //       });
   //       return await storeAudioForNextOpening(this.context.audioFiles[0], 0);
   //     }
   //     // otherwise we want to select the next audio
   //     const audio = this.context.audioFiles[nextAudioIndex];
-  //     const status = await playNext(this.context.playbackObj, audio.uri)
+  //     const status = await playNext(this.context.playbackObj, audio.uri);
   //     this.context.updateState(this.context, {
   //       soundObj: status,
   //       currentAudio: audio,
@@ -74,12 +80,18 @@ class AudioList extends Component {
 
   handleAudioPress = async audio => {
     await selectAudio(audio, this.context);
-    // const {soundObj, playbackObj, currentAudio, updateState, audioFiles} = this.context;
+    // const {
+    //   soundObj,
+    //   playbackObj,
+    //   currentAudio,
+    //   updateState,
+    //   audioFiles,
+    // } = this.context;
     // // playing audio for the first time.
     // if (soundObj === null) {
     //   const playbackObj = new Audio.Sound();
     //   const status = await play(playbackObj, audio.uri);
-    //   const index = audioFiles.indexOf(audio)
+    //   const index = audioFiles.indexOf(audio);
     //   updateState(this.context, {
     //     currentAudio: audio,
     //     playbackObj: playbackObj,
@@ -95,12 +107,12 @@ class AudioList extends Component {
 
     // // pause audio
     // if (
-    //   soundObj.isLoaded && 
-    //   soundObj.isPlaying && 
+    //   soundObj.isLoaded &&
+    //   soundObj.isPlaying &&
     //   currentAudio.id === audio.id
-    //   ) {
-    //     const status = await pause(playbackObj);
-    //     return updateState(this.context, {soundObj: status, isPlaying: false})
+    // ) {
+    //   const status = await pause(playbackObj);
+    //   return updateState(this.context, { soundObj: status, isPlaying: false });
     // }
 
     // // resume audio
@@ -110,13 +122,13 @@ class AudioList extends Component {
     //   currentAudio.id === audio.id
     // ) {
     //   const status = await resume(playbackObj);
-    //   return updateState(this.context, {soundObj: status, isPlaying: true})
+    //   return updateState(this.context, { soundObj: status, isPlaying: true });
     // }
 
     // // select another audio
-    // if(soundObj.isLoaded && currentAudio.id !== audio.id){
-    //   const status = await playNext(playbackObj, audio.uri)
-    //   const index = audioFiles.indexOf(audio)
+    // if (soundObj.isLoaded && currentAudio.id !== audio.id) {
+    //   const status = await playNext(playbackObj, audio.uri);
+    //   const index = audioFiles.indexOf(audio);
     //   updateState(this.context, {
     //     currentAudio: audio,
     //     soundObj: status,
@@ -132,18 +144,12 @@ class AudioList extends Component {
   }
 
   rowRenderer = (type, item, index, extendedState) => {
-    if (!item || typeof item !== 'object') {
-      return null; // Éviter les erreurs si l'élément est null ou n'est pas un objet
-    }
-  
-    const { filename, duration } = item;
-
     return (
       <AudioListItem
-        title={filename ? filename : 'Unknown'}
+        title={item.filename}
         isPlaying={extendedState.isPlaying}
         activeListItem={this.context.currentAudioIndex === index}
-        duration={duration ? duration : 'Unknown'}
+        duration={item.duration}
         onAudioPress={() => this.handleAudioPress(item)}
         onOptionPress={() => {
           this.currentItem = item;
@@ -153,11 +159,18 @@ class AudioList extends Component {
     );
   };
 
+  navigateToPlaylist = () => {
+    this.context.updateState(this.context, {
+      addToPlayList: this.currentItem,
+    });
+    this.props.navigation.navigate('PlayList');
+  };
+
   render() {
     return (
       <AudioContext.Consumer>
         {({ dataProvider, isPlaying }) => {
-          if(!dataProvider._data.length) return null;
+          if (!dataProvider._data.length) return null;
           return (
             <Screen>
               <RecyclerListView
@@ -167,15 +180,21 @@ class AudioList extends Component {
                 extendedState={{ isPlaying }}
               />
               <OptionModal
-                onPlayPress={() => console.log("Playing audio")}
-                onPlayListPress={() => {
-                  this.context.updateState(this.context, {
-                    addToPlayList: this.currentItem,
-                  })
-                  this.props.navigation.navigate('PlayList');
-                }}
+                // onPlayPress={() => console.log('Playig audio')}
+                // onPlayListPress={() => {
+                //   this.context.updateState(this.context, {
+                //     addToPlayList: this.currentItem,
+                //   });
+                //   this.props.navigation.navigate('PlayList');
+                // }}
+                options={[
+                  {
+                    title: 'Add to playlist',
+                    onPress: this.navigateToPlaylist,
+                  },
+                ]}
                 currentItem={this.currentItem}
-                onclose={() =>
+                onClose={() =>
                   this.setState({ ...this.state, optionModalVisible: false })
                 }
                 visible={this.state.optionModalVisible}
@@ -187,5 +206,13 @@ class AudioList extends Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
 
 export default AudioList;
