@@ -121,7 +121,7 @@ const Player = () => {
     };
 
     const renderCurrentTime = () => {
-        if(!context.soundObj && currentAudio.lastPosition){
+        if(!context.soundObj && currentAudio.lastPosition) {
             return convertTime(currentAudio.lastPosition / 1000);
         }
         return convertTime(context.playbackPosition / 1000);

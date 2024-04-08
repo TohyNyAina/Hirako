@@ -28,7 +28,7 @@ class AudioProvider extends Component {
       playbackPosition: null,
       playbackDuration: null,
     };
-    this.totalAudioCount = 0
+    this.totalAudioCount = 0;
   }
 
   permissionAlert = () => {
@@ -53,7 +53,7 @@ class AudioProvider extends Component {
       mediaType: "audio",
       first: media.totalCount,
     });
-    this.totalAudioCount = media.totalCount
+    this.totalAudioCount = media.totalCount;
 
     this.setState({
       dataProvider: dataProvider.cloneWithRows([
@@ -69,17 +69,16 @@ class AudioProvider extends Component {
     let currentAudio;
     let currentAudioIndex;
 
-    if(previousAudio === null){
+    if (previousAudio === null) {
       currentAudio = this.state.audioFiles[0];
-      currentAudioIndex = 0
-    }else{
+      currentAudioIndex = 0;
+    } else {
       previousAudio = JSON.parse(previousAudio);
-      currentAudio = previousAudio.audio
-      currentAudioIndex = previousAudio.index
+      currentAudio = previousAudio.audio;
+      currentAudioIndex = previousAudio.index;
     }
 
-    this.setState({...this.state, currentAudio, currentAudioIndex})
-
+    this.setState({ currentAudio, currentAudioIndex });
   };
 
   getPermission = async () => {
@@ -109,17 +108,22 @@ class AudioProvider extends Component {
   };
 
   onPlaybackStatusUpdate = async (playbackStatus) => {
-    if(playbackStatus.isLoaded && playbackStatus.isPlaying){
+    const { currentAudio } = this.state;
+    if (!currentAudio) {
+      return; // Add a check to ensure currentAudio is defined
+    }
+
+    if (playbackStatus.isLoaded && playbackStatus.isPlaying) {
       this.updateState(this, {
         playbackPosition: playbackStatus.positionMillis,
         playbackDuration: playbackStatus.durationMillis,
       });
     }
 
-    if(playbackStatus.isLoaded && !playbackStatus.isPlaying){
+    if (playbackStatus.isLoaded && !playbackStatus.isPlaying) {
       storeAudioForNextOpening(
-        this.state.currentAudio, 
-        this.state.currentAudioIndex, 
+        currentAudio,
+        this.state.currentAudioIndex,
         playbackStatus.positionMillis
       );
     }
@@ -175,26 +179,26 @@ class AudioProvider extends Component {
 
   componentDidMount() {
     this.getPermission();
-    if(this.state.playbackObj === null){
-      this.setState({...this.state, playbackObj: new Audio.Sound()})
+    if (this.state.playbackObj === null) {
+      this.setState({ ...this.state, playbackObj: new Audio.Sound() });
     }
   }
 
   updateState = (prevState, newState = {}) => {
-    this.setState({...prevState, ...newState})
-  }
+    this.setState({ ...prevState, ...newState });
+  };
 
   render() {
-    const { 
-      audioFiles, 
+    const {
+      audioFiles,
       playList,
       addToPlayList,
-      dataProvider, 
-      permissionError, 
-      playbackObj, 
-      soundObj, 
+      dataProvider,
+      permissionError,
+      playbackObj,
+      soundObj,
       currentAudio,
-      isPlaying, 
+      isPlaying,
       currentAudioIndex,
       playbackPosition,
       playbackDuration,
@@ -211,14 +215,14 @@ class AudioProvider extends Component {
       );
     }
     return (
-      <AudioContext.Provider 
-        value={{ 
-          audioFiles, 
+      <AudioContext.Provider
+        value={{
+          audioFiles,
           playList,
           addToPlayList,
           dataProvider,
-          playbackObj, 
-          soundObj, 
+          playbackObj,
+          soundObj,
           currentAudio,
           isPlaying,
           currentAudioIndex,
@@ -231,7 +235,7 @@ class AudioProvider extends Component {
           loadPreviousAudio: this.loadPreviousAudio,
           onPlaybackStatusUpdate: this.onPlaybackStatusUpdate
         }}
-        >
+      >
         {this.props.children}
       </AudioContext.Provider>
     );
