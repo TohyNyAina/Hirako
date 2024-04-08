@@ -75,9 +75,7 @@ export const selectAudio = async (audio, context, playListInfo = {}) => {
                 activePlayList: [],
                 ...playListInfo
             });
-            playbackObj.setOnPlaybackStatusUpdate(
-                onPlaybackStatusUpdate
-            );
+            playbackObj.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
             return storeAudioForNextOpening(audio, index);
         }
 
