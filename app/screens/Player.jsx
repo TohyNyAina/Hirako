@@ -14,22 +14,14 @@ const {width} = Dimensions.get('window')
 const Player = () => {
     const [currentPosition, setCurrentPosition] = useState()
     const context = useContext (AudioContext);
-    const { 
-        playbackPosition,
-        playbackDuration, 
-        currentAudio,
-    } = context;
+    const { playbackPosition,
+        playbackDuration, } = context;
 
     const calculateSeebBar = () => {
         if(playbackPosition !== null && playbackDuration !== null){
             return playbackPosition / playbackDuration;
         }
-
-        if(currentAudio.lastPosition){
-            return currentAudio.lastPosition / (currentAudio.duration * 1000)
-        }
-
-        return 0;
+        return 0
     };
 
     useEffect(() => {
@@ -121,11 +113,8 @@ const Player = () => {
     };
 
     const renderCurrentTime = () => {
-        if(!context.soundObj && currentAudio.lastPosition) {
-            return convertTime(currentAudio.lastPosition / 1000);
-        }
-        return convertTime(context.playbackPosition / 1000);
-    };
+        return convertTime(context.playbackPosition / 1000)
+    }
 
     if(!context.currentAudio) return null;
 
