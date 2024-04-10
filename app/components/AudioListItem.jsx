@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import color from '../misc/color';
+import PropTypes from 'prop-types'; // Import PropTypes
 
 const getThumbnailText = filename => filename[0];
 
@@ -93,6 +94,7 @@ const AudioListItem = ({
     </>
   );
 };
+
 const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
@@ -145,5 +147,15 @@ const styles = StyleSheet.create({
     color: color.FONT_LIGHT,
   },
 });
+
+// Définissez les types de propriétés attendus
+AudioListItem.propTypes = {
+  title: PropTypes.string.isRequired,
+  duration: PropTypes.number.isRequired,
+  onOptionPress: PropTypes.func.isRequired,
+  onAudioPress: PropTypes.func.isRequired,
+  isPlaying: PropTypes.bool.isRequired,
+  activeListItem: PropTypes.bool.isRequired,
+};
 
 export default AudioListItem;

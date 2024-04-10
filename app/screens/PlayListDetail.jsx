@@ -134,7 +134,7 @@ const PlayListDetail = props => {
         >
           <Text style={styles.title}>{playList.title}</Text>
           <TouchableOpacity onPress={removePlaylist}>
-            <Text style={[styles.title, { color: 'red' }]}>Remove</Text>
+            <Text style={[styles.title, { color: 'red' }]}>Supprimer</Text>
           </TouchableOpacity>
         </View>
         {audios.length ? (
@@ -174,7 +174,7 @@ const PlayListDetail = props => {
       <OptionModal
         visible={modalVisible}
         onClose={closeModal}
-        options={[{ title: 'Remove from playlist', onPress: removeAudio }]}
+        options={[{ title: 'Supprimer de la liste de lecture', onPress: removeAudio }]}
         currentItem={selectedItem}
       />
     </>

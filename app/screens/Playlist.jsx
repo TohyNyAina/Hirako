@@ -100,8 +100,8 @@ const PlayList = ({ navigation }) => {
 
       if (sameAudio) {
         Alert.alert(
-          'Found same audio!',
-          `${addToPlayList.filename} is already inside the list.`
+          'Meme audio detecter!',
+          `${addToPlayList.filename} figure déja dans la liste.`
         );
         sameAudio = false;
         return updateState(context, { addToPlayList: null });
@@ -140,7 +140,7 @@ const PlayList = ({ navigation }) => {
         onPress={() => setModalVisible(true)}
         style={{ marginTop: 15 }}
       >
-        <Text style={styles.playListBtn}>+ Add New Playlist</Text>
+        <Text style={styles.playListBtn}>+ Ajouter une nouvelle liste de lectures</Text>
       </TouchableOpacity>
 
       <PlayListInputModal
