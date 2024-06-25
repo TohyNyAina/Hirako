@@ -19,6 +19,8 @@
     "expo": "~50.0.14",
     "expo-av": "^13.10.5",
     "expo-media-library": "^15.9.1",
+    "expo-speech": "~11.7.0",
+    "expo-speech-recognition": "^0.0.1",
     "expo-status-bar": "~1.11.1",
     "react": "18.2.0",
     "react-dom": "^18.2.0",
@@ -31,7 +33,7 @@
     "recyclerlistview": "^4.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.24.0"
   },
   "private": true
 }

@@ -1,11 +1,11 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 
 import AudioList from '../screens/AudioList';
 import Player from '../screens/Player';
 import PlayList from '../screens/PlayList';
-import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import PlayListDetail from '../screens/PlayListDetail';
 
 const Tab = createBottomTabNavigator();
