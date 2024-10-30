@@ -5,10 +5,11 @@ import {
   Text,
   Dimensions,
   TouchableWithoutFeedback,
+  Animated,
 } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
+import PropTypes from 'prop-types';
 import color from '../misc/color';
-import PropTypes from 'prop-types'; // Import PropTypes
 
 const getThumbnailText = filename => filename[0];
 
@@ -18,29 +19,19 @@ const convertTime = minutes => {
     const minute = hrs.toString().split('.')[0];
     const percent = parseInt(hrs.toString().split('.')[1].slice(0, 2));
     const sec = Math.ceil((60 * percent) / 100);
-
-    if (parseInt(minute) < 10 && sec < 10) {
-      return `0${minute}:0${sec}`;
-    }
-
-    if (parseInt(minute) < 10) {
-      return `0${minute}:${sec}`;
-    }
-
-    if (sec < 10) {
-      return `${minute}:0${sec}`;
-    }
-
-    return `${minute}:${sec}`;
+    return `${minute.padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
   }
 };
 
 const renderPlayPauseIcon = isPlaying => {
-  if (isPlaying)
-    return (
-      <Entypo name='controller-paus' size={24} color={color.ACTIVE_FONT} />
-    );
-  return <Entypo name='controller-play' size={24} color={color.ACTIVE_FONT} />;
+  return (
+    <Entypo
+      name={isPlaying ? 'controller-paus' : 'controller-play'}
+      size={28}
+      color='#f94c57'
+      style={{ opacity: isPlaying ? 1 : 0.7 }}
+    />
+  );
 };
 
 const AudioListItem = ({
@@ -50,48 +41,69 @@ const AudioListItem = ({
   onAudioPress,
   isPlaying,
   activeListItem,
+  titleColor,
 }) => {
+  const scaleAnim = new Animated.Value(1);
+  const neonGlow = activeListItem ? 'rgba(255, 109, 0, 0.6)' : 'transparent';
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 3,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
-    <>
-      <View style={styles.container}>
-        <TouchableWithoutFeedback onPress={onAudioPress}>
-          <View style={styles.leftContainer}>
-            <View
-              style={[
-                styles.thumbnail,
-                {
-                  backgroundColor: activeListItem
-                    ? color.ACTIVE_BG
-                    : color.FONT_LIGHT,
-                },
-              ]}
-            >
-              <Text style={styles.thumbnailText}>
-                {activeListItem
-                  ? renderPlayPauseIcon(isPlaying)
-                  : getThumbnailText(title)}
-              </Text>
-            </View>
-            <View style={styles.titleContainer}>
-              <Text numberOfLines={1} style={styles.title}>
-                {title}
-              </Text>
-              <Text style={styles.timeText}>{convertTime(duration)}</Text>
-            </View>
+    <Animated.View style={[styles.container, { transform: [{ scale: scaleAnim }] }]}>
+      <TouchableWithoutFeedback
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={onAudioPress}
+      >
+        <View style={styles.leftContainer}>
+          <View
+            style={[
+              styles.thumbnail,
+              {
+                backgroundColor: activeListItem
+                  ? 'rgba(255, 255, 255, 0.8)'
+                  : '#f94c57',
+                shadowColor: neonGlow,
+              },
+            ]}
+          >
+            <Animated.Text style={[styles.thumbnailText]}>
+              {activeListItem
+                ? renderPlayPauseIcon(isPlaying)
+                : getThumbnailText(title)}
+            </Animated.Text>
           </View>
-        </TouchableWithoutFeedback>
-        <View style={styles.rightContainer}>
-          <Entypo
-            onPress={onOptionPress}
-            name='dots-three-vertical'
-            size={20}
-            color={color.FONT_MEDIUM}
-            style={{ padding: 10 }}
-          />
+          <View style={styles.titleContainer}>
+            <Text numberOfLines={1} style={[styles.title, { color: titleColor || '#FFF' }]}>
+              {title}
+            </Text>
+            <Text style={styles.timeText}>{convertTime(duration)}</Text>
+          </View>
         </View>
+      </TouchableWithoutFeedback>
+      <View style={styles.rightContainer}>
+        <Entypo
+          onPress={onOptionPress}
+          name='dots-three-vertical'
+          size={22}
+          color='#FFFFFF99'
+          style={styles.optionIcon}
+        />
       </View>
-      <View style={styles.separator} />
-    </>
+    </Animated.View>
   );
 };
 
@@ -100,7 +112,19 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignSelf: 'center',
-    width: width - 80,
+    width: width - 55,
+    marginVertical: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 10,
+    borderRadius: 25,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)', // Fond transparent noir
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 5,
+    // borderBottomWidth:2,
+    // borderBottomColor:color.FONT_LIGHT
   },
   leftContainer: {
     flexDirection: 'row',
@@ -114,41 +138,39 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   thumbnail: {
-    height: 50,
-    flexBasis: 50,
-    backgroundColor: color.FONT_LIGHT,
+    height: 55,
+    width: 55,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 25,
+    borderRadius: 10,
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    shadowColor: 'rgba(255, 109, 0, 0.5)', // Effet néon doux
   },
   thumbnailText: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: color.FONT,
+    color: '#FFF',
   },
   titleContainer: {
-    width: width - 180,
-    paddingLeft: 10,
+    width: width - 170,
+    paddingLeft: 14,
   },
   title: {
     fontSize: 16,
-    color: color.FONT,
-  },
-  separator: {
-    width: width - 80,
-    backgroundColor: '#333',
-    opacity: 0.3,
-    height: 0.5,
-    alignSelf: 'center',
-    marginTop: 10,
+    fontWeight: '500',
+    color: '#FFF',
   },
   timeText: {
     fontSize: 14,
-    color: color.FONT_LIGHT,
+    color: '#BBBBBB',
+  },
+  optionIcon: {
+    padding: 10,
   },
 });
 
-// Définissez les types de propriétés attendus
 AudioListItem.propTypes = {
   title: PropTypes.string.isRequired,
   duration: PropTypes.number.isRequired,
@@ -156,6 +178,7 @@ AudioListItem.propTypes = {
   onAudioPress: PropTypes.func.isRequired,
   isPlaying: PropTypes.bool.isRequired,
   activeListItem: PropTypes.bool.isRequired,
+  titleColor: PropTypes.string,
 };
 
 export default AudioListItem;

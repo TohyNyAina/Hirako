@@ -1,17 +1,15 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import {
   View,
   StyleSheet,
   Text,
   ScrollView,
   TouchableOpacity,
-  FlatList,
-  Alert,
+  Animated,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import PlayListInputModal from '../components/PlayListInputModal';
 import { AudioContext } from '../context/AudioProvider';
-import color from '../misc/color';
 import PlayListDetail from '../components/PlayListDetail';
 
 let selectedPlayList = {};
@@ -22,18 +20,13 @@ const PlayList = ({ navigation }) => {
   const context = useContext(AudioContext);
   const { playList, addToPlayList, updateState } = context;
 
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
   const createPlayList = async playListName => {
     const result = await AsyncStorage.getItem('playlist');
     if (result !== null) {
-      const audios = [];
-      if (addToPlayList) {
-        audios.push(addToPlayList);
-      }
-      const newList = {
-        id: Date.now(),
-        title: playListName,
-        audios: audios,
-      };
+      const audios = addToPlayList ? [addToPlayList] : [];
+      const newList = { id: Date.now(), title: playListName, audios };
 
       const updatedList = [...playList, newList];
       updateState(context, { addToPlayList: null, playList: updatedList });
@@ -44,28 +37,18 @@ const PlayList = ({ navigation }) => {
 
   const renderPlayList = async () => {
     const result = await AsyncStorage.getItem('playlist');
-    if (result === null) {
-      const defaultPlayList = {
-        id: Date.now(),
-        title: 'My Favorite',
-        audios: [],
-      };
-
+    if (!result) {
+      const defaultPlayList = { id: Date.now(), title: 'My Favorite', audios: [] };
       const newPlayList = [...playList, defaultPlayList];
-      updateState(context, { playList: [...newPlayList] });
-      return await AsyncStorage.setItem(
-        'playlist',
-        JSON.stringify([...newPlayList])
-      );
+      updateState(context, { playList: newPlayList });
+      await AsyncStorage.setItem('playlist', JSON.stringify(newPlayList));
+    } else {
+      updateState(context, { playList: JSON.parse(result) });
     }
-
-    updateState(context, { playList: JSON.parse(result) });
   };
 
   useEffect(() => {
-    if (!playList.length) {
-      renderPlayList();
-    }
+    if (!playList.length) renderPlayList();
   }, []);
 
   const handleBannerPress = async playList => {
@@ -118,66 +101,84 @@ const PlayList = ({ navigation }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {playList.length
-        ? playList.map(item => (
-            <TouchableOpacity
-              key={item.id.toString()}
-              style={styles.playListBanner}
-              onPress={() => handleBannerPress(item)}
-            >
-              <Text>{item.title}</Text>
-              <Text style={styles.audioCount}>
-                {item.audios.length > 1
-                  ? `${item.audios.length} Songs`
-                  : `${item.audios.length} Song`}
-              </Text>
-            </TouchableOpacity>
-          ))
-        : null}
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        {playList.length
+          ? playList.map(item => (
+              <TouchableOpacity
+                key={item.id.toString()}
+                activeOpacity={0.85}
+                onPress={() => handleBannerPress(item)}
+              >
+                <Animated.View style={[styles.playListBanner, { transform: [{ scale: scaleAnim }] }]}>
+                  <Text style={styles.playListTitle}>{item.title}</Text>
+                  <Text style={styles.audioCount}>
+                    {item.audios.length > 1 ? `${item.audios.length} Songs` : `${item.audios.length} Song`}
+                  </Text>
+                </Animated.View>
+              </TouchableOpacity>
+            ))
+          : null}
 
-      <TouchableOpacity
-        onPress={() => setModalVisible(true)}
-        style={{ marginTop: 15 }}
-      >
-        <Text style={styles.playListBtn}>+ Ajouter une nouvelle liste de lectures</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.addButton}>
+          <Text style={styles.addButtonText}>+ Nouvelle Playlist </Text>
+        </TouchableOpacity>
+      </ScrollView>
 
-      <PlayListInputModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onSubmit={createPlayList}
-      />
-      <PlayListDetail
-        visible={showPlayList}
-        playList={selectedPlayList}
-        onClose={() => setShowPlayList(false)}
-      />
-    </ScrollView>
+      <PlayListInputModal visible={modalVisible} onClose={() => setModalVisible(false)} onSubmit={createPlayList} />
+      <PlayListDetail visible={showPlayList} playList={selectedPlayList} onClose={() => setShowPlayList(false)} />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+  },
+  scrollView: {
+    padding: 38,
   },
   playListBanner: {
-    padding: 5,
-    backgroundColor: 'rgba(204,204,204,0.3)',
-    borderRadius: 5,
-    marginBottom: 15,
+    padding: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 5,
+    marginTop: 30, // Ajustez cette valeur pour descendre la bannière
+  },
+  playListTitle: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '600',
+    
   },
   audioCount: {
     marginTop: 3,
-    opacity: 0.5,
-    fontSize: 14,
+    color: '#AAAAAA',
+    fontSize: 13,
   },
-  playListBtn: {
-    color: color.ACTIVE_BG,
-    letterSpacing: 1,
-    fontWeight: 'bold',
-    fontSize: 14,
-    padding: 5,
+  addButton: {
+    alignSelf: 'center',
+    backgroundColor: '#ff4c5b',
+    borderRadius: 25,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginVertical: 40,
+    shadowColor: 'rgba(255, 75, 95, 0.4)',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  addButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

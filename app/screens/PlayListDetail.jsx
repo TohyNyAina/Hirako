@@ -8,6 +8,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; // Ajoutez une bibliothèque d'icônes
 import { selectAudio } from '../misc/audioController';
 import color from '../misc/color';
 import AudioListItem from '../components/AudioListItem';
@@ -35,17 +36,9 @@ const PlayListDetail = props => {
     setModalVisible(false);
   };
   const removeAudio = async () => {
-    let isPlaying = context.isPlaying;
-    let isPlayListRunning = context.isPlayListRunning;
-    let soundObj = context.soundObj;
-    let playbackPosition = context.playbackPosition;
-    let activePlayList = context.activePlayList;
+    let { isPlaying, isPlayListRunning, soundObj, playbackPosition, activePlayList } = context;
 
-    if (
-      context.isPlayListRunning &&
-      context.currentAudio.id === selectedItem.id
-    ) {
-      // stop
+    if (isPlayListRunning && context.currentAudio.id === selectedItem.id) {
       await context.playbackObj.stopAsync();
       await context.playbackObj.unloadAsync();
       isPlaying = false;
@@ -59,11 +52,8 @@ const PlayListDetail = props => {
     const result = await AsyncStorage.getItem('playlist');
     if (result !== null) {
       const oldPlayLists = JSON.parse(result);
-      const updatedPlayLists = oldPlayLists.filter(item => {
-        if (item.id === playList.id) {
-          item.audios = newAudios;
-        }
-
+      const updatedPlayLists = oldPlayLists.map(item => {
+        if (item.id === playList.id) item.audios = newAudios;
         return item;
       });
 
@@ -83,14 +73,9 @@ const PlayListDetail = props => {
   };
 
   const removePlaylist = async () => {
-    let isPlaying = context.isPlaying;
-    let isPlayListRunning = context.isPlayListRunning;
-    let soundObj = context.soundObj;
-    let playbackPosition = context.playbackPosition;
-    let activePlayList = context.activePlayList;
+    let { isPlaying, isPlayListRunning, soundObj, playbackPosition, activePlayList } = context;
 
-    if (context.isPlayListRunning && activePlayList.id === playList.id) {
-      // stop
+    if (isPlayListRunning && activePlayList.id === playList.id) {
       await context.playbackObj.stopAsync();
       await context.playbackObj.unloadAsync();
       isPlaying = false;
@@ -103,9 +88,7 @@ const PlayListDetail = props => {
     const result = await AsyncStorage.getItem('playlist');
     if (result !== null) {
       const oldPlayLists = JSON.parse(result);
-      const updatedPlayLists = oldPlayLists.filter(
-        item => item.id !== playList.id
-      );
+      const updatedPlayLists = oldPlayLists.filter(item => item.id !== playList.id);
 
       AsyncStorage.setItem('playlist', JSON.stringify(updatedPlayLists));
       context.updateState(context, {
@@ -124,51 +107,41 @@ const PlayListDetail = props => {
   return (
     <>
       <View style={styles.container}>
-        <View
-          style={{
-            width: '100%',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            paddingHorizontal: 15,
-          }}
-        >
+        <View style={styles.header}>
           <Text style={styles.title}>{playList.title}</Text>
           <TouchableOpacity onPress={removePlaylist}>
-            <Text style={[styles.title, { color: 'red' }]}>Supprimer</Text>
+            <Ionicons name="trash" size={24} color="#FF3B30" />
           </TouchableOpacity>
         </View>
+
         {audios.length ? (
-          <FlatList
-            contentContainerStyle={styles.listContainer}
-            data={audios}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({ item }) => (
-              <View style={{ marginBottom: 10 }}>
-                <AudioListItem
-                  title={item.filename}
-                  duration={item.duration}
-                  isPlaying={context.isPlaying}
-                  activeListItem={item.id === context.currentAudio.id}
-                  onAudioPress={() => playAudio(item)}
-                  onOptionPress={() => {
-                    setSelectedItem(item);
-                    setModalVisible(true);
-                  }}
-                />
-              </View>
-            )}
-          />
+         <FlatList
+         contentContainerStyle={styles.listContainer}
+         data={audios}
+         keyExtractor={(item) => item.id.toString()}
+         renderItem={({ item }) => (
+           <View style={styles.audioItemContainer}>
+             <AudioListItem
+               title={item.filename}
+               duration={item.duration}
+               isPlaying={context.isPlaying}
+               activeListItem={item.id === context.currentAudio.id}
+               onAudioPress={() => playAudio(item)}  // Vérifiez que cette fonction est bien définie
+               onOptionPress={() => {
+                 setSelectedItem(item);
+                 setModalVisible(true);
+               }}
+               titleStyle={styles.audioTitle}
+             />
+           </View>
+         )}
+       />
+       
         ) : (
-          <Text
-            style={{
-              fontWeight: 'bold',
-              color: color.FONT_LIGHT,
-              fontSize: 25,
-              paddingTop: 50,
-            }}
-          >
-            No Audio
-          </Text>
+          <View style={styles.noAudioContainer}>
+            <Ionicons name="musical-notes-outline" size={50} color="#AAAAAA" />
+            <Text style={styles.noAudioText}>Aucun Audio Disponible</Text>
+          </View>
         )}
       </View>
       <OptionModal
@@ -183,17 +156,61 @@ const PlayListDetail = props => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    paddingTop: 50,
+    paddingHorizontal: 20,
     alignItems: 'center',
+    backgroundColor: '#1C1C1E',
   },
-  listContainer: {
-    padding: 20,
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
   },
   title: {
-    textAlign: 'center',
-    fontSize: 20,
-    paddingVertical: 5,
+    fontSize: 26,
+    color: '#FFFFFF',
     fontWeight: 'bold',
-    color: color.ACTIVE_BG,
+  },
+  listContainer: {
+    width: '100%',
+    marginTop: 15,
+  },
+  audioItemContainer: {
+    marginVertical: 5,
+    paddingHorizontal: 9,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 10,
+    shadowColor: 'rgba(255,255,255,0.1)',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  audioTitle: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  noAudioContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noAudioText: {
+    fontSize: 20,
+    color: '#AAAAAA',
+    marginTop: 10,
+  },
+  separator: {
+    height: 1,
+    // backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor:'#fff',
+    marginVertical: 5,
   },
 });
 
